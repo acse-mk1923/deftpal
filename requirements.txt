@@ -1,9 +1,11 @@
 fastapi
 uvicorn
+pydantic
 torch
 numpy
 pandas
 scikit-learn
-PyEMD
 joblib
+PyEMD
 matplotlib
+python-dotenv

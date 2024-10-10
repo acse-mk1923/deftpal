@@ -1,8 +1,10 @@
+#api/models/train_evaluate.py
+
 import torch
 import torch.nn as nn
 import torch.optim as optim
 from torch.utils.data import DataLoader
-from data_loader import *
+from models.data_loader import *
 import logging
 import matplotlib.pyplot as plt
 from torch.optim.lr_scheduler import ReduceLROnPlateau
@@ -159,76 +161,3 @@ def train_imf_model(model, train_loader, val_loader, criterion, optimizer, imf_i
     # Ensure the final model is the best one
     model.load_state_dict(best_model_state)
     return model
-
-# def train_imf_model(model, train_loader, criterion, optimizer, imf_index, num_imfs, *, num_epochs=50, device='mps', patience=50, max_grad_norm=1.0, window_size=100, spike_threshold=2.0, warm_reset_threshold=10, reversion_epochs=5):
-#     model.to(device)
-#     best_train_loss = float('inf')
-#     best_model_state = None
-#     warm_reset_counter = 0
-
-#     print(f"Training IMF model on full dataset for index: {imf_index}, num_imfs: {num_imfs}")
-#     print(f"Device: {device}, Max grad norm: {max_grad_norm}")
-#     print(f"Window size: {window_size}, Spike threshold: {spike_threshold}")
-#     print(f"Warm reset threshold: {warm_reset_threshold}")
-
-#     for epoch in range(num_epochs):
-#         model.train()
-#         total_train_loss = 0
-#         losses = []
-#         moving_avg = None
-
-#         for i, batch in enumerate(train_loader):
-#             optimizer.zero_grad()
-
-#             outputs, targets = process_batch(batch, model, imf_index, num_imfs, device)
-
-#             loss = criterion(outputs, targets)
-
-#             if torch.isnan(loss):
-#                 print("NaN detected in loss. Skipping this batch.")
-#                 continue
-
-#             loss.backward()
-#             torch.nn.utils.clip_grad_norm_(model.parameters(), max_norm=max_grad_norm)
-#             optimizer.step()
-
-#             current_loss = loss.item()
-#             total_train_loss += current_loss
-#             losses.append(current_loss)
-
-#             if moving_avg is None:
-#                 moving_avg = current_loss
-#             else:
-#                 moving_avg = 0.99 * moving_avg + 0.01 * current_loss
-
-#             if len(losses) >= window_size:
-#                 recent_avg = sum(losses[-window_size:]) / window_size
-#                 if recent_avg > spike_threshold * moving_avg:
-#                     print(f"Training spike detected. Recent Avg: {recent_avg}, Moving Avg: {moving_avg}")
-#                     break
-
-#             if i % 100 == 0:
-#                 print(f"Epoch [{epoch+1}/{num_epochs}], Batch [{i}/{len(train_loader)}], Loss: {current_loss:.4f}, Moving Avg: {moving_avg:.4f}")
-
-#         avg_train_loss = total_train_loss / len(train_loader)
-
-#         print(f'Epoch [{epoch+1}/{num_epochs}], Train Loss: {avg_train_loss:.4f}')
-
-#         # Save the best model state if the training loss improves
-#         if avg_train_loss < best_train_loss:
-#             best_train_loss = avg_train_loss
-#             best_model_state = copy.deepcopy(model.state_dict())
-#             warm_reset_counter = 0
-#         else:
-#             warm_reset_counter += 1
-
-#             if warm_reset_counter >= warm_reset_threshold:
-#                 print(f"Warm reset triggered after {warm_reset_counter} epochs without improvement")
-#                 model, optimizer = warm_reset(model, optimizer)
-#                 warm_reset_counter = 0
-
-#     print(f"Training completed. Best training loss: {best_train_loss:.4f}")
-
-#     # Ensure the final model is the best one
-#     model.load_state_dict(best_model_state)
-#     return model

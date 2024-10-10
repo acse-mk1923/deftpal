@@ -1,6 +1,8 @@
+#api/models/lstm_imf.py
+
 import torch
 import torch.nn as nn
-from RevIN import RevIN
+from models.RevIN import RevIN
 import logging
 from math import sqrt
 
